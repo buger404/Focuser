@@ -16,7 +16,8 @@ Attribute VB_Exposed = False
     Dim Page As GPage
     Dim EndHour As Long, EndMinute As Long, EndPercent As Long
     Dim OtherTick As Long, FocusTick As Long, StartTime As Long
-    Dim EndHwnd As Long, ForceMode As Long
+    Dim EndHwnd As Long, ForceMode As Long, EndString As String * 255
+    Dim MY As Long, MData As Long
     Dim Step As Long, lP As POINTAPI
 '======================================
 
@@ -53,15 +54,44 @@ Public Sub Update()
     End If
 End Sub
 Sub Step0()
+    Dim m As MButtonState
+    
     Page.Paint 0, 0, 0, GW + 1, 50, argb(40, 0, 0, 0)
     Page.Writes "专注结束时间", GW / 2, 10, 18, argb(255, 255, 255, 255), align:=StringAlignmentCenter, style:=FontStyleBold
     
-    Page.Writes format(EndHour, "00"), 0, 60, 24, argb(200, 255, 255, 255), GW / 2 - 10, 35, align:=StringAlignmentCenter, style:=FontStyleBold
-    If CheckMouse2 = mMouseUp Then EndHour = EndHour + 1
+    Page.Writes format(EndHour, "00"), 0, 60, 24, IIf(MY <> -1 And Mouse.X <= GW / 2, argb(255, 254, 205, 1), argb(200, 255, 255, 255)), GW / 2 - 10, 35, align:=StringAlignmentCenter, style:=FontStyleBold
+    If MY <> -1 Then
+        m = CheckMouse(0, 0, GW / 2, GH)
+    Else
+        m = CheckMouse2
+    End If
+    
+    If m = mMouseDown Then
+        If MY = -1 Then MY = Mouse.y: MData = EndHour
+        EndHour = ((MData - (((Mouse.y - MY) / 100 * 24) Mod 24) + 24) Mod 24)
+    ElseIf m = mMouseUp Then
+        If Mouse.y = MY Or MY = -1 Then EndHour = EndHour + 1
+        MY = -1
+    End If
+
     If EndHour >= 24 Then EndHour = 0
+    
     Page.Writes ":", GW / 2 - 10, 58, 24, argb(255, 255, 255, 255), 20, 35, align:=StringAlignmentCenter, style:=FontStyleBold
-    Page.Writes format(EndMinute, "00"), GW / 2 + 10, 60, 24, argb(200, 255, 255, 255), GW / 2 - 10, 35, align:=StringAlignmentCenter, style:=FontStyleBold
-    If CheckMouse2 = mMouseUp Then EndMinute = EndMinute + 5
+    Page.Writes format(EndMinute, "00"), GW / 2 + 10, 60, 24, IIf(MY <> -1 And Mouse.X > GW / 2, argb(255, 254, 205, 1), argb(200, 255, 255, 255)), GW / 2 - 10, 35, align:=StringAlignmentCenter, style:=FontStyleBold
+    If MY <> -1 Then
+        m = CheckMouse(GW / 2, 0, GW / 2, GH)
+    Else
+        m = CheckMouse2
+    End If
+    
+    If m = mMouseDown Then
+        If MY = -1 Then MY = Mouse.y: MData = EndMinute
+        EndMinute = ((MData - (((Mouse.y - MY) / 100 * 60) Mod 60) + 60) Mod 60)
+    ElseIf m = mMouseUp Then
+        If Mouse.y = MY Or MY = -1 Then EndMinute = EndMinute + 5
+        MY = -1
+    End If
+    
     If EndMinute >= 60 Then EndMinute = 0
     
     Page.Paint 0, 0, GH - 39, GW + 1, 40, argb(255, 24, 180, 255)
@@ -72,9 +102,22 @@ Sub Step1()
     Page.Paint 0, 0, 0, GW + 1, 50, argb(40, 0, 0, 0)
     Page.Writes "专注百分比", GW / 2, 10, 18, argb(255, 255, 255, 255), align:=StringAlignmentCenter, style:=FontStyleBold
     
-    Page.Writes EndPercent & "%", 0, 60, 24, argb(200, 255, 255, 255), GW, 35, align:=StringAlignmentCenter, style:=FontStyleBold
-    If CheckMouse2 = mMouseUp Then EndPercent = EndPercent + 5
-    If EndPercent >= 100 Then EndPercent = 0
+    Page.Writes EndPercent & "%", 0, 60, 24, IIf(MY <> -1, argb(255, 254, 205, 1), argb(200, 255, 255, 255)), GW, 35, align:=StringAlignmentCenter, style:=FontStyleBold
+    If MY <> -1 Then
+        m = CheckMouse(0, 0, GW, GH)
+    Else
+        m = CheckMouse2
+    End If
+    
+    If m = mMouseDown Then
+        If MY = -1 Then MY = Mouse.y: MData = EndPercent
+        EndPercent = ((MData - (((Mouse.y - MY) / 100 * 100) Mod 100) + 100) Mod 100)
+    ElseIf m = mMouseUp Then
+        If Mouse.y = MY Or MY = -1 Then EndPercent = EndPercent + 5
+        MY = -1
+    End If
+    
+    If EndPercent > 100 Then EndPercent = 0
     
     Page.Paint 0, 0, GH - 39, GW + 1, 40, argb(255, 24, 180, 255)
     If CheckMouse2 = mMouseUp Then StartTime = GetTickCount: Step = 4: ECore.NewTransform transDarkTo
@@ -83,20 +126,32 @@ End Sub
 Sub Step2()
     Page.Paint 0, 0, 0, GW + 1, 50, argb(40, 0, 0, 0)
     Page.Writes "专注窗口", GW / 2, 10, 18, argb(255, 255, 255, 255), align:=StringAlignmentCenter, style:=FontStyleBold
+    Dim p As POINTAPI, Title As String * 255
+    On Error Resume Next
+    GetCursorPos p
+    GetWindowTextA GetParenter(WindowFromPoint(p.X, p.y)), Title, 255
+    
     If 6 - Int((GetTickCount - StartTime) / 1000) <= 0 Then
-        Dim p As POINTAPI, Hwnd As Long
+        Dim Hwnd As Long
         GetCursorPos p
         Hwnd = WindowFromPoint(p.X, p.y)
         Do While GetParent(Hwnd) <> 0
             Hwnd = GetParent(Hwnd)
             DoEvents
         Loop
-        EndHwnd = Hwnd
+        EndString = Title
+        EndHwnd = Hwnd: OtherTick = 0: FocusTick = 0
         GameWindow.Move Screen.Width - 10 * Screen.TwipsPerPixelX - GameWindow.Width, Screen.Height - 10 * Screen.TwipsPerPixelY - GameWindow.Height - GetTaskbarHeight
         StartTime = GetTickCount: Step = 3: ECore.NewTransform transDarkTo
         Exit Sub
     End If
-    Page.Writes 6 - Int((GetTickCount - StartTime) / 1000) & "s后设置鼠标所在的窗口为专注窗口", 0, 75, 14, argb(255, 255, 255, 255), GW, 35, align:=StringAlignmentCenter
+    
+    If WindowFromPoint(p.X, p.y) = GameWindow.Hwnd Then
+        StartTime = GetTickCount
+        Page.Writes "当前窗口无效", 0, 50, 14, argb(255, 255, 255, 255), GW, 93, align:=StringAlignmentCenter, style:=FontStyleBold
+    Else
+        Page.Writes 6 - Int((GetTickCount - StartTime) / 1000) & "s后设置鼠标所在的窗口为专注窗口" & vbCrLf & "当前：" & vbCrLf & Replace(Title, Chr(0), ""), 0, 50, 14, argb(255, 255, 255, 255), GW, 93, align:=StringAlignmentCenter, style:=FontStyleBold
+    End If
 End Sub
 Sub Step4()
     Page.Paint 0, 0, 0, GW + 1, 50, argb(40, 0, 0, 0)
@@ -115,12 +170,15 @@ Public Function GetTaskbarHeight() As Integer
     GetTaskbarHeight = ((Screen.Height / Screen.TwipsPerPixelY) - rectVal.Bottom) * Screen.TwipsPerPixelY
 End Function
 Sub Step3()
-    Dim Per As Long
+    Dim Per As Long, Title As String * 255, Hwnd As Long
     On Error Resume Next
-    If GetForegroundWindow = EndHwnd Then
+    Hwnd = GetParenter(GetForegroundWindow)
+    GetWindowTextA Hwnd, Title, 255
+    
+    If Hwnd = EndHwnd And Title = EndString Then
         Dim p As POINTAPI
         GetCursorPos p
-        If WindowFromPoint(p.X, p.y) <> EndHwnd Then
+        If GetParenter(WindowFromPoint(p.X, p.y)) <> EndHwnd Then
             OtherTick = OtherTick + 1
         Else
             lP = p
@@ -155,7 +213,17 @@ Sub Step3()
         Page.Paint 0, 0, GH - (GH * Per / 100), GW + 1, GH * Per / 100 + 1, argb(100, 9, 241, 117)
     End If
     Page.Writes Per & "%", 0, 60, 24, argb(255, 255, 255, 255), GW, 35, align:=StringAlignmentCenter, style:=FontStyleBold
+
+    'Sleep 100
 End Sub
+Function GetParenter(Hwnd As Long) As Long
+    Dim h As Long
+    h = Hwnd
+    Do While GetParent(h) > 0
+        h = GetParent(h)
+    Loop
+    GetParenter = h
+End Function
 Public Sub Wheel(Direction As Integer, Depth As Single)
     '鼠标滚轮事件
     'Direction:方向，Depth：深度
@@ -188,6 +256,7 @@ Private Sub Class_Initialize()
     '创建页面
     ECore.Add Page, "GamePage"
     EndPercent = 85
+    MY = -1
     EndHour = Hour(Now): EndMinute = Int(Minute(Now) / 5) * 5
     '===============================================
     '   如果需要添加动画，请放置在此处

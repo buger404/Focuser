@@ -49,14 +49,14 @@ End Sub
 
 Private Sub Form_Load()
     '初始化Emerald（在此处可以修改窗口大小哟~）
-    StartEmerald Me.hwnd, 150, 150
+    StartEmerald Me.Hwnd, 150, 150
     '创建字体
     MakeFont "微软雅黑"
     '创建页面管理器
     Set EC = New GMan
     EC.Layered False
-    Win10Blur Me.hwnd, argb(120, 64, 64, 72)
-    SetWindowPos Me.hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE Or SWP_NOMOVE
+    BlurWindow Me.Hwnd, argb(120, 64, 64, 72)
+    SetWindowPos Me.Hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE Or SWP_NOMOVE
     Set o = New WinShadow
     With o
         If .Shadow(Me) Then
@@ -90,22 +90,22 @@ Private Sub Form_Load()
     EC.ActivePage = "GamePage"
 End Sub
 
-Private Sub Form_MouseDown(button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseDown(button As Integer, Shift As Integer, X As Single, y As Single)
     '发送鼠标信息
-    UpdateMouse x, y, 1, button
+    UpdateMouse X, y, 1, button
 End Sub
 
-Private Sub Form_MouseMove(button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseMove(button As Integer, Shift As Integer, X As Single, y As Single)
     '发送鼠标信息
     If Mouse.State = 0 Then
-        UpdateMouse x, y, 0, button
+        UpdateMouse X, y, 0, button
     Else
-        Mouse.x = x: Mouse.y = y
+        Mouse.X = X: Mouse.y = y
     End If
 End Sub
-Private Sub Form_MouseUp(button As Integer, Shift As Integer, x As Single, y As Single)
+Private Sub Form_MouseUp(button As Integer, Shift As Integer, X As Single, y As Single)
     '发送鼠标信息
-    UpdateMouse x, y, 2, button
+    UpdateMouse X, y, 2, button
 End Sub
 
 Private Sub Form_Unload(Cancel As Integer)
