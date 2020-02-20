@@ -16,7 +16,7 @@ Attribute VB_Exposed = False
     Dim Page As GPage
     Dim EndHour As Long, EndMinute As Long, EndPercent As Long
     Dim OtherTick As Long, FocusTick As Long, StartTime As Long
-    Dim EndHwnd As Long, ForceMode As Long, EndString As String * 255
+    Dim ForceMode As Long, EndString As String * 255
     Dim MY As Long, MData As Long
     Dim Step As Long, lP As POINTAPI
 '======================================

@@ -4,7 +4,8 @@ Public Declare Function SystemParametersInfo Lib "user32" Alias "SystemParameter
 Public Const SPI_GETWORKAREA = 48
 Public Type RECT
     Left As Long
-    Top As Long
+    top As Long
     Right As Long
     Bottom As Long
 End Type
+Public EndHwnd As Long
