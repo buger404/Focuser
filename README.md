@@ -6,27 +6,27 @@
 为了更有效地监督你学习。
 # 使用方法
 * 第一步  
-<img src="screenhost/permission.png">
+<img src="screenhost/permission.png"></img>
 双击EXE，提示开启高性能模式，选择是否都可以。  
 * 第二步  
-<img src="screenhost/timeset.png">
+<img src="screenhost/timeset.png"></img>
 设置你的专注结束时间（点击界面上的数字或拖动），也就是下课时间。  
 * 第三步  
-<img src="screenhost/percent.png">
+<img src="screenhost/percent.png"></img>
 设置`专注百分比`，即看网课的时间占使用电脑时间的百分比，如果你对自己很严格，可以设置为100%。  
 * 第四步  
-<img src="screenhost/forcemode.png">
+<img src="screenhost/forcemode.png"></img>
 默认禁用**强迫模式**，您可以选择启用，启用后您就只能乖乖听网课。（如果还有一台手机在身边就当我没说）  
 * 第五步  
-<img src="screenhost/live.png">
+<img src="screenhost/live.png"></img>
 **把你的鼠标放在网课界面上面**，然后等待6秒钟。
 * 第六步  
 `专注百分比`将显示在右下角
-<img src="screenhost/high.png">
+<img src="screenhost/high.png"></img>
 当你的专注度远高于你的目标时，颜色为**绿色**；
-<img src="screenhost/default.png">
+<img src="screenhost/default.png"></img>
 当你的专注度基本在你的预期内时，颜色为**黄色**；
-<img src="screenhost/low.png">
+<img src="screenhost/low.png"></img>
 当你的专注度低于你的目标时，颜色为**红色**。
 此处如果开启强迫模式，程序将参与监督，最小化您网课以外的所有窗口并且锁定鼠标的位置。
 # 注意
